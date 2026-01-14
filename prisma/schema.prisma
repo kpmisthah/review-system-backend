@@ -1,0 +1,79 @@
+// Prisma Schema for Mock Interview Review System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - Seniors, Juniors, Admins
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(JUNIOR)
+  batch     String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reviewsGiven     Review[]        @relation("SeniorReviews")
+  reviewsReceived  Review[]        @relation("JuniorReviews")
+  requestsMade     ReviewRequest[] @relation("JuniorRequests")
+  requestsReceived ReviewRequest[] @relation("SeniorRequests")
+}
+
+enum Role {
+  JUNIOR
+  SENIOR
+  ADMIN
+}
+
+// Review Request - Junior requests a review from Senior
+model ReviewRequest {
+  id          String        @id @default(uuid())
+  topic       String        // e.g., "React Hooks", "System Design"
+  description String?
+  status      RequestStatus @default(PENDING)
+  scheduledAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  junior   User    @relation("JuniorRequests", fields: [juniorId], references: [id])
+  juniorId String
+  senior   User?   @relation("SeniorRequests", fields: [seniorId], references: [id])
+  seniorId String?
+  review   Review?
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+  CANCELLED
+}
+
+// Review - Feedback given by Senior to Junior
+model Review {
+  id           String   @id @default(uuid())
+  rating       Int      // 1-5 stars
+  strengths    String   // What the junior did well
+  improvements String   // Areas to improve
+  notes        String?  // Additional notes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  senior    User          @relation("SeniorReviews", fields: [seniorId], references: [id])
+  seniorId  String
+  junior    User          @relation("JuniorReviews", fields: [juniorId], references: [id])
+  juniorId  String
+  request   ReviewRequest @relation(fields: [requestId], references: [id])
+  requestId String        @unique
+}
