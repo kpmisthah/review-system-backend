@@ -3,11 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/prisma');
 const { authenticateToken } = require('../middleware/auth.middleware');
+const { validateRegistration, validateLogin } = require('../middleware/validation.middleware');
 
 const router = express.Router();
 
 // Register new user
-router.post('/register', async (req, res) => {
+router.post('/register', validateRegistration, async (req, res) => {
     try {
         const { email, password, name, role, batch } = req.body;
 
@@ -43,7 +44,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login user
-router.post('/login', async (req, res) => {
+router.post('/login', validateLogin, async (req, res) => {
     try {
         const { email, password } = req.body;
 
