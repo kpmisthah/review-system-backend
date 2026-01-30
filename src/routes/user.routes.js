@@ -1,5 +1,6 @@
 const express = require('express');
 const prisma = require('../config/prisma');
+const bcrypt = require('bcryptjs');
 const { authenticateToken, isAdmin } = require('../middleware/auth.middleware');
 
 const router = express.Router();
@@ -61,6 +62,49 @@ router.patch('/:id/role', authenticateToken, isAdmin, async (req, res) => {
     } catch (error) {
         console.error('Update role error:', error);
         res.status(500).json({ error: 'Failed to update user role' });
+    }
+});
+
+// Update own profile
+router.patch('/profile', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, batch, avatar, currentPassword, newPassword } = req.body;
+        const updateData = {};
+
+        if (name) updateData.name = name;
+        if (batch) updateData.batch = batch;
+        if (avatar) updateData.avatar = avatar;
+
+        if (newPassword) {
+            if (!currentPassword) {
+                return res.status(400).json({ error: 'Current password is required to set a new password' });
+            }
+
+            // Fetch user with password to verify
+            const userWithPassword = await prisma.user.findUnique({
+                where: { id: userId }
+            });
+
+            const validPassword = await bcrypt.compare(currentPassword, userWithPassword.password);
+            if (!validPassword) {
+                return res.status(401).json({ error: 'Invalid current password' });
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            updateData.password = hashedPassword;
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+            select: { id: true, name: true, email: true, role: true, batch: true, avatar: true }
+        });
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({ error: 'Failed to update profile' });
     }
 });
 
