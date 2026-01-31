@@ -5,17 +5,47 @@ const { authenticateToken, isAdmin } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
-// Get all seniors (for juniors to request reviews)
-router.get('/seniors', authenticateToken, async (req, res) => {
+// Get all mentors (for discovery)
+router.get('/mentors', authenticateToken, async (req, res) => {
     try {
-        const seniors = await prisma.user.findMany({
-            where: { role: 'SENIOR' },
-            select: { id: true, name: true, email: true, batch: true, avatar: true }
+        const { skill, search } = req.query;
+
+        const where = {
+            role: 'SENIOR' // For now, only seniors are mentors
+        };
+
+        if (skill) {
+            where.skills = {
+                has: skill
+            };
+        }
+
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: 'insensitive' } },
+                { bio: { contains: search, mode: 'insensitive' } }
+            ];
+        }
+
+        const mentors = await prisma.user.findMany({
+            where,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                batch: true,
+                avatar: true,
+                bio: true,
+                experience: true,
+                skills: true,
+                linkedin: true,
+                github: true
+            }
         });
-        res.json(seniors);
+        res.json(mentors);
     } catch (error) {
-        console.error('Get seniors error:', error);
-        res.status(500).json({ error: 'Failed to fetch seniors' });
+        console.error('Get mentors error:', error);
+        res.status(500).json({ error: 'Failed to fetch mentors' });
     }
 });
 
@@ -69,12 +99,17 @@ router.patch('/:id/role', authenticateToken, isAdmin, async (req, res) => {
 router.patch('/profile', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
-        const { name, batch, avatar, currentPassword, newPassword } = req.body;
+        const { name, batch, avatar, currentPassword, newPassword, bio, experience, skills, linkedin, github } = req.body;
         const updateData = {};
 
         if (name) updateData.name = name;
         if (batch) updateData.batch = batch;
         if (avatar) updateData.avatar = avatar;
+        if (bio !== undefined) updateData.bio = bio;
+        if (experience !== undefined) updateData.experience = parseInt(experience);
+        if (skills) updateData.skills = skills;
+        if (linkedin !== undefined) updateData.linkedin = linkedin;
+        if (github !== undefined) updateData.github = github;
 
         if (newPassword) {
             if (!currentPassword) {
@@ -98,7 +133,19 @@ router.patch('/profile', authenticateToken, async (req, res) => {
         const updatedUser = await prisma.user.update({
             where: { id: userId },
             data: updateData,
-            select: { id: true, name: true, email: true, role: true, batch: true, avatar: true }
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                batch: true,
+                avatar: true,
+                bio: true,
+                experience: true,
+                skills: true,
+                linkedin: true,
+                github: true
+            }
         });
 
         res.json(updatedUser);

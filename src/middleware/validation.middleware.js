@@ -28,6 +28,11 @@ const validateLogin = [
 const validateProfileUpdate = [
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
     body('newPassword').optional().isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+    body('bio').optional().isString(),
+    body('experience').optional().isInt({ min: 0 }).withMessage('Experience must be a positive number'),
+    body('skills').optional().isArray().withMessage('Skills must be an array'),
+    body('linkedin').optional().isURL().withMessage('Invalid LinkedIn URL'),
+    body('github').optional().isURL().withMessage('Invalid GitHub URL'),
     validateRequest
 ];
 

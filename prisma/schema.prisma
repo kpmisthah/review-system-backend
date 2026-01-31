@@ -18,6 +18,14 @@ model User {
   role      Role     @default(JUNIOR)
   batch     String?
   avatar    String?
+  
+  // Mentorship Profile
+  bio       String?
+  experience Int?      @default(0) // Years of experience
+  skills    String[]   @default([])
+  linkedin  String?
+  github    String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
