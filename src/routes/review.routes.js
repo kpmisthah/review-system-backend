@@ -63,7 +63,17 @@ router.get('/requests/pending', authenticateToken, isSenior, async (req, res) =>
                 ]
             },
             include: {
-                junior: { select: { id: true, name: true, email: true, batch: true } }
+                junior: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        batch: true,
+                        avatar: true,
+                        bio: true,
+                        skills: true
+                    }
+                }
             },
             orderBy: { createdAt: 'desc' }
         });
