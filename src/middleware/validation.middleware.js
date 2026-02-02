@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+import { body, validationResult } from 'express-validator';
 
 // Validation wrapper
 const validateRequest = (req, res, next) => {
@@ -12,20 +12,20 @@ const validateRequest = (req, res, next) => {
     next();
 };
 
-const validateRegistration = [
+export const validateRegistration = [
     body('email').isEmail().withMessage('Invalid email address'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     body('name').notEmpty().withMessage('Name is required'),
     validateRequest
 ];
 
-const validateLogin = [
+export const validateLogin = [
     body('email').isEmail().withMessage('Invalid email address'),
     body('password').exists().withMessage('Password is required'),
     validateRequest
 ];
 
-const validateProfileUpdate = [
+export const validateProfileUpdate = [
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
     body('newPassword').optional().isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
     body('bio').optional().isString(),
@@ -35,9 +35,3 @@ const validateProfileUpdate = [
     body('github').optional().isURL().withMessage('Invalid GitHub URL'),
     validateRequest
 ];
-
-module.exports = {
-    validateRegistration,
-    validateLogin,
-    validateProfileUpdate
-};

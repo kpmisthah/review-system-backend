@@ -1,6 +1,6 @@
-const prisma = require('../config/prisma');
+import prisma from '../config/prisma.js';
 
-class ReviewRepository {
+export default class ReviewRepository {
     // Review Request operations
     async createRequest(data) {
         return prisma.reviewRequest.create({
@@ -96,5 +96,3 @@ class ReviewRepository {
         });
     }
 }
-
-module.exports = ReviewRepository;

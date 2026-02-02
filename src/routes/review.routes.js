@@ -1,6 +1,6 @@
-const express = require('express');
-const { authenticateToken, isSenior } = require('../middleware/auth.middleware');
-const { reviewController } = require('../container');
+import express from 'express';
+import { authenticateToken, isSenior } from '../middleware/auth.middleware.js';
+import { reviewController } from '../container.js';
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ router.get('/my', authenticateToken, (req, res, next) => reviewController.getMyR
 // Get reviews given by senior
 router.get('/given', authenticateToken, isSenior, (req, res, next) => reviewController.getGivenReviews(req, res, next));
 
-module.exports = router;
+export default router;

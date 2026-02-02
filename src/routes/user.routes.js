@@ -1,6 +1,6 @@
-const express = require('express');
-const { authenticateToken, isAdmin } = require('../middleware/auth.middleware');
-const { userController } = require('../container');
+import express from 'express';
+import { authenticateToken, isAdmin } from '../middleware/auth.middleware.js';
+import { userController } from '../container.js';
 
 const router = express.Router();
 
@@ -19,4 +19,4 @@ router.patch('/:id/role', authenticateToken, isAdmin, (req, res, next) => userCo
 // Update own profile
 router.patch('/profile', authenticateToken, (req, res, next) => userController.updateProfile(req, res, next));
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-class AppError extends Error {
+export class AppError extends Error {
     constructor(message, statusCode, code) {
         super(message);
         this.statusCode = statusCode;
@@ -9,34 +9,26 @@ class AppError extends Error {
     }
 }
 
-class ValidationError extends AppError {
+export class ValidationError extends AppError {
     constructor(message) {
         super(message, 400, 'VALIDATION_ERROR');
     }
 }
 
-class NotFoundError extends AppError {
+export class NotFoundError extends AppError {
     constructor(message) {
         super(message, 404, 'NOT_FOUND');
     }
 }
 
-class AuthenticationError extends AppError {
+export class AuthenticationError extends AppError {
     constructor(message) {
         super(message, 401, 'AUTHENTICATION_ERROR');
     }
 }
 
-class ForbiddenError extends AppError {
+export class ForbiddenError extends AppError {
     constructor(message) {
         super(message, 403, 'FORBIDDEN_ERROR');
     }
 }
-
-module.exports = {
-    AppError,
-    ValidationError,
-    NotFoundError,
-    AuthenticationError,
-    ForbiddenError
-};

@@ -1,4 +1,4 @@
-class AuthController {
+export default class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
@@ -39,5 +39,3 @@ class AuthController {
         res.json({ user: req.user });
     }
 }
-
-module.exports = AuthController;

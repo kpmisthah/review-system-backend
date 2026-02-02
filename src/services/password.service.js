@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 
-class PasswordService {
+export default class PasswordService {
     async hash(password) {
         return bcrypt.hash(password, 10);
     }
@@ -9,5 +9,3 @@ class PasswordService {
         return bcrypt.compare(plainInfo, hashedInfo);
     }
 }
-
-module.exports = PasswordService; // Exporting Class, not instance

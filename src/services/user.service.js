@@ -1,6 +1,6 @@
-const { NotFoundError, ValidationError, AuthenticationError } = require('../utils/AppError');
+import { NotFoundError, ValidationError, AuthenticationError } from '../utils/AppError.js';
 
-class UserService {
+export default class UserService {
     constructor(userRepository, passwordService) {
         this.userRepository = userRepository;
         this.passwordService = passwordService;
@@ -96,5 +96,3 @@ class UserService {
         );
     }
 }
-
-module.exports = UserService;

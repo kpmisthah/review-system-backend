@@ -1,6 +1,6 @@
-const prisma = require('../config/prisma');
+import prisma from '../config/prisma.js';
 
-class UserRepository {
+export default class UserRepository {
     async create(userData, select = null) {
         return prisma.user.create({
             data: userData,
@@ -32,5 +32,3 @@ class UserRepository {
         });
     }
 }
-
-module.exports = UserRepository;

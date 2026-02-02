@@ -1,6 +1,6 @@
-const { NotFoundError } = require('../utils/AppError');
+import { NotFoundError } from '../utils/AppError.js';
 
-class ReviewService {
+export default class ReviewService {
     constructor(reviewRepository) {
         this.reviewRepository = reviewRepository;
     }
@@ -73,5 +73,3 @@ class ReviewService {
         return this.reviewRepository.findReviewsBySeniorId(seniorId);
     }
 }
-
-module.exports = ReviewService;

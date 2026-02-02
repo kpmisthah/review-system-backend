@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const prisma = require('../config/prisma');
+import jwt from 'jsonwebtoken';
+import prisma from '../config/prisma.js';
 
 // Verify JWT token
-const authenticateToken = async (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -29,7 +29,7 @@ const authenticateToken = async (req, res, next) => {
 };
 
 // Check if user is Senior
-const isSenior = (req, res, next) => {
+export const isSenior = (req, res, next) => {
     if (req.user.role !== 'SENIOR' && req.user.role !== 'ADMIN') {
         return res.status(403).json({ error: 'Senior access required' });
     }
@@ -37,11 +37,9 @@ const isSenior = (req, res, next) => {
 };
 
 // Check if user is Admin
-const isAdmin = (req, res, next) => {
+export const isAdmin = (req, res, next) => {
     if (req.user.role !== 'ADMIN') {
         return res.status(403).json({ error: 'Admin access required' });
     }
     next();
 };
-
-module.exports = { authenticateToken, isSenior, isAdmin };

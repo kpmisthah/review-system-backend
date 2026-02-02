@@ -1,4 +1,4 @@
-class ReviewController {
+export default class ReviewController {
     constructor(reviewService) {
         this.reviewService = reviewService;
     }
@@ -67,5 +67,3 @@ class ReviewController {
         }
     }
 }
-
-module.exports = ReviewController;

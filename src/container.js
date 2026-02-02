@@ -1,14 +1,14 @@
-const UserRepository = require('./repositories/user.repository');
-const ReviewRepository = require('./repositories/review.repository');
+import UserRepository from './repositories/user.repository.js';
+import ReviewRepository from './repositories/review.repository.js';
 
-const PasswordService = require('./services/password.service');
-const UserService = require('./services/user.service');
-const AuthService = require('./services/auth.service');
-const ReviewService = require('./services/review.service');
+import PasswordService from './services/password.service.js';
+import UserService from './services/user.service.js';
+import AuthService from './services/auth.service.js';
+import ReviewService from './services/review.service.js';
 
-const UserController = require('./controllers/user.controller');
-const AuthController = require('./controllers/auth.controller');
-const ReviewController = require('./controllers/review.controller');
+import UserController from './controllers/user.controller.js';
+import AuthController from './controllers/auth.controller.js';
+import ReviewController from './controllers/review.controller.js';
 
 // Repositories
 const userRepository = new UserRepository();
@@ -25,9 +25,8 @@ const userController = new UserController(userService);
 const authController = new AuthController(authService);
 const reviewController = new ReviewController(reviewService);
 
-module.exports = {
+export {
     userController,
     authController,
     reviewController
-    // Can export services/repos if needed eleswhere
 };

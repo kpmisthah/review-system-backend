@@ -1,7 +1,7 @@
-const express = require('express');
-const { authenticateToken } = require('../middleware/auth.middleware');
-const { validateRegistration, validateLogin } = require('../middleware/validation.middleware');
-const { authController } = require('../container');
+import express from 'express';
+import { authenticateToken } from '../middleware/auth.middleware.js';
+import { validateRegistration, validateLogin } from '../middleware/validation.middleware.js';
+import { authController } from '../container.js';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.post('/login', validateLogin, (req, res, next) => authController.login(re
 // Get current user profile
 router.get('/me', authenticateToken, (req, res, next) => authController.getCurrentUser(req, res, next));
 
-module.exports = router;
+export default router;

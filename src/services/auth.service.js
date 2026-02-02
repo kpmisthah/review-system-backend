@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const { AuthenticationError, ValidationError } = require('../utils/AppError');
+import jwt from 'jsonwebtoken';
+import { AuthenticationError, ValidationError } from '../utils/AppError.js';
 
-class AuthService {
+export default class AuthService {
     constructor(userRepository, passwordService) {
         this.userRepository = userRepository;
         this.passwordService = passwordService;
@@ -50,5 +50,3 @@ class AuthService {
         return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
     }
 }
-
-module.exports = AuthService;
