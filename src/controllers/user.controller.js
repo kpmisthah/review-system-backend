@@ -1,65 +1,56 @@
-const userService = require('../services/user.service');
-
 class UserController {
-    async getMentors(req, res) {
+    constructor(userService) {
+        this.userService = userService;
+    }
+
+    async getMentors(req, res, next) {
         try {
             const { skill, search } = req.query;
-            const mentors = await userService.getMentors(skill, search);
+            const mentors = await this.userService.getMentors(skill, search);
             res.json(mentors);
         } catch (error) {
-            console.error('Get mentors error:', error);
-            res.status(500).json({ error: 'Failed to fetch mentors' });
+            next(error);
         }
     }
 
-    async getJuniors(req, res) {
+    async getJuniors(req, res, next) {
         try {
-            const juniors = await userService.getJuniors();
+            const juniors = await this.userService.getJuniors();
             res.json(juniors);
         } catch (error) {
-            console.error('Get juniors error:', error);
-            res.status(500).json({ error: 'Failed to fetch juniors' });
+            next(error);
         }
     }
 
-    async getAllUsers(req, res) {
+    async getAllUsers(req, res, next) {
         try {
-            const users = await userService.getAllUsers();
+            const users = await this.userService.getAllUsers();
             res.json(users);
         } catch (error) {
-            console.error('Get users error:', error);
-            res.status(500).json({ error: 'Failed to fetch users' });
+            next(error);
         }
     }
 
-    async updateUserRole(req, res) {
+    async updateUserRole(req, res, next) {
         try {
             const { id } = req.params;
             const { role } = req.body;
-            const user = await userService.updateUserRole(id, role);
+            const user = await this.userService.updateUserRole(id, role);
             res.json(user);
         } catch (error) {
-            console.error('Update role error:', error);
-            res.status(500).json({ error: 'Failed to update user role' });
+            next(error);
         }
     }
 
-    async updateProfile(req, res) {
+    async updateProfile(req, res, next) {
         try {
             const userId = req.user.id;
-            const updatedUser = await userService.updateProfile(userId, req.body);
+            const updatedUser = await this.userService.updateProfile(userId, req.body);
             res.json(updatedUser);
         } catch (error) {
-            console.error('Update profile error:', error);
-            if (error.message === 'PASSWORD_REQUIRED') {
-                return res.status(400).json({ error: 'Current password is required to set a new password' });
-            }
-            if (error.message === 'INVALID_PASSWORD') {
-                return res.status(401).json({ error: 'Invalid current password' });
-            }
-            res.status(500).json({ error: 'Failed to update profile' });
+            next(error);
         }
     }
 }
 
-module.exports = new UserController();
+module.exports = UserController;

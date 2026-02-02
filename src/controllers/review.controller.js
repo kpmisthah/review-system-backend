@@ -1,86 +1,71 @@
-const reviewService = require('../services/review.service');
-
 class ReviewController {
-    // Junior: Create a review request
-    async createRequest(req, res) {
+    constructor(reviewService) {
+        this.reviewService = reviewService;
+    }
+
+    async createRequest(req, res, next) {
         try {
-            const request = await reviewService.createRequest(req.user.id, req.body);
+            const request = await this.reviewService.createRequest(req.user.id, req.body);
             res.status(201).json(request);
         } catch (error) {
-            console.error('Create request error:', error);
-            res.status(500).json({ error: 'Failed to create review request' });
+            next(error);
         }
     }
 
-    // Junior: Get my requests
-    async getMyRequests(req, res) {
+    async getMyRequests(req, res, next) {
         try {
-            const requests = await reviewService.getMyRequests(req.user.id);
+            const requests = await this.reviewService.getMyRequests(req.user.id);
             res.json(requests);
         } catch (error) {
-            console.error('Get my requests error:', error);
-            res.status(500).json({ error: 'Failed to fetch requests' });
+            next(error);
         }
     }
 
-    // Senior: Get pending requests
-    async getPendingRequests(req, res) {
+    async getPendingRequests(req, res, next) {
         try {
-            const requests = await reviewService.getPendingRequests(req.user.id);
+            const requests = await this.reviewService.getPendingRequests(req.user.id);
             res.json(requests);
         } catch (error) {
-            console.error('Get pending requests error:', error);
-            res.status(500).json({ error: 'Failed to fetch pending requests' });
+            next(error);
         }
     }
 
-    // Senior: Accept request
-    async acceptRequest(req, res) {
+    async acceptRequest(req, res, next) {
         try {
             const { id } = req.params;
-            const request = await reviewService.acceptRequest(id, req.user.id);
+            const request = await this.reviewService.acceptRequest(id, req.user.id);
             res.json(request);
         } catch (error) {
-            console.error('Accept request error:', error);
-            res.status(500).json({ error: 'Failed to accept request' });
+            next(error);
         }
     }
 
-    // Senior: Submit review
-    async submitReview(req, res) {
+    async submitReview(req, res, next) {
         try {
-            const review = await reviewService.submitReview(req.user.id, req.body);
+            const review = await this.reviewService.submitReview(req.user.id, req.body);
             res.status(201).json(review);
         } catch (error) {
-            console.error('Submit review error:', error);
-            if (error.message === 'REQUEST_NOT_FOUND') {
-                return res.status(404).json({ error: 'Review request not found' });
-            }
-            res.status(500).json({ error: 'Failed to submit review' });
+            next(error);
         }
     }
 
-    // Junior: Get received reviews
-    async getMyReviews(req, res) {
+    async getMyReviews(req, res, next) {
         try {
-            const reviews = await reviewService.getMyReviews(req.user.id);
+            const reviews = await this.reviewService.getMyReviews(req.user.id);
             res.json(reviews);
         } catch (error) {
-            console.error('Get my reviews error:', error);
-            res.status(500).json({ error: 'Failed to fetch reviews' });
+            next(error);
         }
     }
 
-    // Senior: Get given reviews
-    async getGivenReviews(req, res) {
+    async getGivenReviews(req, res, next) {
         try {
-            const reviews = await reviewService.getGivenReviews(req.user.id);
+            const reviews = await this.reviewService.getGivenReviews(req.user.id);
             res.json(reviews);
         } catch (error) {
-            console.error('Get given reviews error:', error);
-            res.status(500).json({ error: 'Failed to fetch reviews' });
+            next(error);
         }
     }
 }
 
-module.exports = new ReviewController();
+module.exports = ReviewController;
