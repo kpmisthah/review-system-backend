@@ -97,4 +97,4 @@ class ReviewRepository {
     }
 }
 
-module.exports = new ReviewRepository();
+module.exports = ReviewRepository;
