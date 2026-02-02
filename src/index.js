@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const { AppError } = require('./utils/AppError');
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +23,19 @@ app.use('/api/reviews', require('./routes/review.routes'));
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running!' });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    // console.error(err.stack); // Optionally log stack trace
+
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({ error: err.message });
+    }
+
+    // Handle generic/unexpected errors
+    console.error('Unexpected Error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
 });
 
 // Start server
