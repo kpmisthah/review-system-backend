@@ -1,17 +1,17 @@
-const userRepository = require('../repositories/user.repository');
-const bcrypt = require('bcryptjs');
+const { NotFoundError, ValidationError, AuthenticationError } = require('../utils/AppError');
 
 class UserService {
+    constructor(userRepository, passwordService) {
+        this.userRepository = userRepository;
+        this.passwordService = passwordService;
+    }
+
     async getMentors(skill, search) {
         const where = {
-            role: 'SENIOR' // For now, only seniors are mentors
+            role: 'SENIOR'
         };
 
-        if (skill) {
-            where.skills = {
-                has: skill
-            };
-        }
+        if (skill) where.skills = { has: skill };
 
         if (search) {
             where.OR = [
@@ -20,38 +20,34 @@ class UserService {
             ];
         }
 
-        return userRepository.findAll({
+        return this.userRepository.findAll({
             where,
             select: {
-                id: true,
-                name: true,
-                email: true,
-                batch: true,
-                avatar: true,
-                bio: true,
-                experience: true,
-                skills: true,
-                linkedin: true,
-                github: true
+                id: true, name: true, email: true, batch: true,
+                avatar: true, bio: true, experience: true,
+                skills: true, linkedin: true, github: true
             }
         });
     }
 
     async getJuniors() {
-        return userRepository.findAll({
+        return this.userRepository.findAll({
             where: { role: 'JUNIOR' },
             select: { id: true, name: true, email: true, batch: true, avatar: true }
         });
     }
 
     async getAllUsers() {
-        return userRepository.findAll({
+        return this.userRepository.findAll({
             select: { id: true, name: true, email: true, role: true, batch: true, createdAt: true }
         });
     }
 
     async updateUserRole(id, role) {
-        return userRepository.update(
+        const user = await this.userRepository.findById(id);
+        if (!user) throw new NotFoundError('User not found');
+
+        return this.userRepository.update(
             id,
             { role },
             { id: true, name: true, email: true, role: true }
@@ -73,40 +69,32 @@ class UserService {
 
         if (newPassword) {
             if (!currentPassword) {
-                // We'll throw an error and handle it in controller
-                throw new Error('PASSWORD_REQUIRED');
+                throw new ValidationError('Current password is required to set a new password');
             }
 
-            const userWithPassword = await userRepository.findById(userId);
-            if (!userWithPassword) throw new Error('USER_NOT_FOUND');
+            const userWithPassword = await this.userRepository.findById(userId);
+            if (!userWithPassword) throw new NotFoundError('User not found');
 
-            const validPassword = await bcrypt.compare(currentPassword, userWithPassword.password);
+            const validPassword = await this.passwordService.compare(currentPassword, userWithPassword.password);
             if (!validPassword) {
-                throw new Error('INVALID_PASSWORD');
+                throw new AuthenticationError('Invalid current password');
             }
 
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const hashedPassword = await this.passwordService.hash(newPassword);
             updateData.password = hashedPassword;
         }
 
-        return userRepository.update(
+        return this.userRepository.update(
             userId,
             updateData,
             {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                batch: true,
-                avatar: true,
-                bio: true,
-                experience: true,
-                skills: true,
-                linkedin: true,
-                github: true
+                id: true, name: true, email: true, role: true,
+                batch: true, avatar: true, bio: true,
+                experience: true, skills: true,
+                linkedin: true, github: true
             }
         );
     }
 }
 
-module.exports = new UserService();
+module.exports = UserService;

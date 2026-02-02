@@ -1,19 +1,23 @@
-const userRepository = require('../repositories/user.repository');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { AuthenticationError, ValidationError } = require('../utils/AppError');
 
 class AuthService {
+    constructor(userRepository, passwordService) {
+        this.userRepository = userRepository;
+        this.passwordService = passwordService;
+    }
+
     async register(data) {
         const { email, password, name, role, batch } = data;
 
-        const existingUser = await userRepository.findByEmail(email);
+        const existingUser = await this.userRepository.findByEmail(email);
         if (existingUser) {
-            throw new Error('EMAIL_EXISTS');
+            throw new ValidationError('Email already registered');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await this.passwordService.hash(password);
 
-        const user = await userRepository.create({
+        const user = await this.userRepository.create({
             email,
             password: hashedPassword,
             name,
@@ -21,25 +25,20 @@ class AuthService {
             batch
         }, { id: true, email: true, name: true, role: true, batch: true });
 
-        // We only want to return specific fields, but create returns all. 
-        // We can filter in controller or here. Let's do nothing here to keep it simple or use select in create if repository supports it.
-        // My UserRepository.create takes `data`. It simply returns logic.
-
-        // Generate token
         const token = this.generateToken(user.id);
 
         return { user, token };
     }
 
     async login(email, password) {
-        const user = await userRepository.findByEmail(email);
+        const user = await this.userRepository.findByEmail(email);
         if (!user) {
-            throw new Error('INVALID_CREDENTIALS');
+            throw new AuthenticationError('Invalid email or password');
         }
 
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await this.passwordService.compare(password, user.password);
         if (!validPassword) {
-            throw new Error('INVALID_CREDENTIALS');
+            throw new AuthenticationError('Invalid email or password');
         }
 
         const token = this.generateToken(user.id);
@@ -52,4 +51,4 @@ class AuthService {
     }
 }
 
-module.exports = new AuthService();
+module.exports = AuthService;

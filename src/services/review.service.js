@@ -1,10 +1,14 @@
-const reviewRepository = require('../repositories/review.repository');
+const { NotFoundError } = require('../utils/AppError');
 
 class ReviewService {
+    constructor(reviewRepository) {
+        this.reviewRepository = reviewRepository;
+    }
+
     async createRequest(userId, requestData) {
         const { topic, description, seniorId, scheduledAt } = requestData;
 
-        return reviewRepository.createRequest({
+        return this.reviewRepository.createRequest({
             topic,
             description,
             juniorId: userId,
@@ -14,15 +18,15 @@ class ReviewService {
     }
 
     async getMyRequests(userId) {
-        return reviewRepository.findRequestsByJuniorId(userId);
+        return this.reviewRepository.findRequestsByJuniorId(userId);
     }
 
     async getPendingRequests(seniorId) {
-        return reviewRepository.findPendingRequestsForSenior(seniorId);
+        return this.reviewRepository.findPendingRequestsForSenior(seniorId);
     }
 
     async acceptRequest(requestId, seniorId) {
-        return reviewRepository.updateRequest(
+        return this.reviewRepository.updateRequest(
             requestId,
             {
                 status: 'ACCEPTED',
@@ -38,14 +42,14 @@ class ReviewService {
         const { requestId, rating, strengths, improvements, notes } = reviewData;
 
         // Get the request to find junior
-        const request = await reviewRepository.findRequestById(requestId);
+        const request = await this.reviewRepository.findRequestById(requestId);
 
         if (!request) {
-            throw new Error('REQUEST_NOT_FOUND');
+            throw new NotFoundError('Review request not found');
         }
 
         // Create review
-        const review = await reviewRepository.createReview({
+        const review = await this.reviewRepository.createReview({
             rating,
             strengths,
             improvements,
@@ -56,18 +60,18 @@ class ReviewService {
         });
 
         // Update request status
-        await reviewRepository.updateRequest(requestId, { status: 'COMPLETED' });
+        await this.reviewRepository.updateRequest(requestId, { status: 'COMPLETED' });
 
         return review;
     }
 
     async getMyReviews(userId) {
-        return reviewRepository.findReviewsByJuniorId(userId);
+        return this.reviewRepository.findReviewsByJuniorId(userId);
     }
 
     async getGivenReviews(seniorId) {
-        return reviewRepository.findReviewsBySeniorId(seniorId);
+        return this.reviewRepository.findReviewsBySeniorId(seniorId);
     }
 }
 
-module.exports = new ReviewService();
+module.exports = ReviewService;
