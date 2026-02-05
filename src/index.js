@@ -25,7 +25,12 @@ app.use('/api/reviews', reviewRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Server is running!' });
+    res.json({
+        status: 'ok',
+        message: 'Server is running!',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Global Error Handler
