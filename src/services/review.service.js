@@ -5,6 +5,12 @@ export default class ReviewService {
         this.reviewRepository = reviewRepository;
     }
 
+    /**
+     * Create a new review request (Junior)
+     * @param {string} userId 
+     * @param {Object} requestData 
+     * @returns {Promise<Object>}
+     */
     async createRequest(userId, requestData) {
         const { topic, description, seniorId, scheduledAt } = requestData;
 
@@ -17,14 +23,30 @@ export default class ReviewService {
         });
     }
 
+    /**
+     * Get review requests for a user
+     * @param {string} userId 
+     * @returns {Promise<Array>}
+     */
     async getMyRequests(userId) {
         return this.reviewRepository.findRequestsByJuniorId(userId);
     }
 
+    /**
+     * Get pending requests for a senior
+     * @param {string} seniorId 
+     * @returns {Promise<Array>}
+     */
     async getPendingRequests(seniorId) {
         return this.reviewRepository.findPendingRequestsForSenior(seniorId);
     }
 
+    /**
+     * Accept a review request (Senior)
+     * @param {string} requestId 
+     * @param {string} seniorId 
+     * @returns {Promise<Object>}
+     */
     async acceptRequest(requestId, seniorId) {
         return this.reviewRepository.updateRequest(
             requestId,
@@ -38,6 +60,12 @@ export default class ReviewService {
         );
     }
 
+    /**
+     * Submit a review (Senior)
+     * @param {string} seniorId 
+     * @param {Object} reviewData 
+     * @returns {Promise<Object>}
+     */
     async submitReview(seniorId, reviewData) {
         const { requestId, rating, strengths, improvements, notes } = reviewData;
 
@@ -65,10 +93,20 @@ export default class ReviewService {
         return review;
     }
 
+    /**
+     * Get reviews received by a user (Junior)
+     * @param {string} userId 
+     * @returns {Promise<Array>}
+     */
     async getMyReviews(userId) {
         return this.reviewRepository.findReviewsByJuniorId(userId);
     }
 
+    /**
+     * Get reviews given by a senior
+     * @param {string} seniorId 
+     * @returns {Promise<Array>}
+     */
     async getGivenReviews(seniorId) {
         return this.reviewRepository.findReviewsBySeniorId(seniorId);
     }
