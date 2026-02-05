@@ -7,6 +7,11 @@ export default class AuthService {
         this.passwordService = passwordService;
     }
 
+    /**
+     * Register a new user
+     * @param {Object} data - Registration data
+     * @returns {Promise<{user: Object, token: string}>}
+     */
     async register(data) {
         const { email, password, name, role, batch } = data;
 
@@ -30,6 +35,12 @@ export default class AuthService {
         return { user, token };
     }
 
+    /**
+     * Authenticate user and return token
+     * @param {string} email 
+     * @param {string} password 
+     * @returns {Promise<{user: Object, token: string}>}
+     */
     async login(email, password) {
         const user = await this.userRepository.findByEmail(email);
         if (!user) {
@@ -46,6 +57,11 @@ export default class AuthService {
         return { user, token };
     }
 
+    /**
+     * Generate JWT Token
+     * @param {string} userId 
+     * @returns {string} JWT Token
+     */
     generateToken(userId) {
         return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
     }
