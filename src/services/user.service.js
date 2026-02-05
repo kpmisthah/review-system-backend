@@ -6,6 +6,12 @@ export default class UserService {
         this.passwordService = passwordService;
     }
 
+    /**
+     * Get list of mentors with optional filters
+     * @param {string} skill 
+     * @param {string} search 
+     * @returns {Promise<Array>}
+     */
     async getMentors(skill, search) {
         const where = {
             role: 'SENIOR'
@@ -30,6 +36,10 @@ export default class UserService {
         });
     }
 
+    /**
+     * Get list of junior developers
+     * @returns {Promise<Array>}
+     */
     async getJuniors() {
         return this.userRepository.findAll({
             where: { role: 'JUNIOR' },
@@ -37,12 +47,22 @@ export default class UserService {
         });
     }
 
+    /**
+     * Get all users (Admin)
+     * @returns {Promise<Array>}
+     */
     async getAllUsers() {
         return this.userRepository.findAll({
             select: { id: true, name: true, email: true, role: true, batch: true, createdAt: true }
         });
     }
 
+    /**
+     * Update user role (Admin)
+     * @param {string} id 
+     * @param {string} role 
+     * @returns {Promise<Object>}
+     */
     async updateUserRole(id, role) {
         const user = await this.userRepository.findById(id);
         if (!user) throw new NotFoundError('User not found');
@@ -54,6 +74,12 @@ export default class UserService {
         );
     }
 
+    /**
+     * Update user profile
+     * @param {string} userId 
+     * @param {Object} updateDataRaw 
+     * @returns {Promise<Object>}
+     */
     async updateProfile(userId, updateDataRaw) {
         const { currentPassword, newPassword, ...rest } = updateDataRaw;
         const updateData = {};
