@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticateToken, isAdmin } from '../middleware/auth.middleware.js';
+import { validateProfileUpdate } from '../middleware/validation.middleware.js';
 import { userController } from '../container.js';
 
 const router = express.Router();
@@ -17,6 +18,6 @@ router.get('/', authenticateToken, isAdmin, (req, res, next) => userController.g
 router.patch('/:id/role', authenticateToken, isAdmin, (req, res, next) => userController.updateUserRole(req, res, next));
 
 // Update own profile
-router.patch('/profile', authenticateToken, (req, res, next) => userController.updateProfile(req, res, next));
+router.patch('/profile', authenticateToken, validateProfileUpdate, (req, res, next) => userController.updateProfile(req, res, next));
 
 export default router;

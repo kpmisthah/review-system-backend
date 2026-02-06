@@ -35,3 +35,19 @@ export const validateProfileUpdate = [
     body('github').optional().isURL().withMessage('Invalid GitHub URL'),
     validateRequest
 ];
+
+export const validateReviewRequest = [
+    body('topic').notEmpty().withMessage('topic is required'),
+    body('description').optional().isString(),
+    body('seniorId').optional().isUUID().withMessage('Invalid Senior ID'),
+    body('scheduledAt').optional().isISO8601().toDate().withMessage('Invalid date format'),
+    validateRequest
+];
+
+export const validateReviewSubmission = [
+    body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
+    body('strengths').isArray().withMessage('Strengths must be an array'),
+    body('improvements').isArray().withMessage('Improvements must be an array'),
+    body('notes').optional().isString(),
+    validateRequest
+];
